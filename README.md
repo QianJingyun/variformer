@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/817970898.svg)](https://doi.org/10.5281/zenodo.16969871)
+
 Welcome to the Variformer repository! This repository is meant to fine-tune sequence-to-expression models using paired whole genome sequencing (WGS) and gene expression data. We focus on [Enformer](https://www.nature.com/articles/s41592-021-01252-x), although the code used here can be adapted to other models.
 
 Our preprint is out! Find it [here](https://www.biorxiv.org/content/10.1101/2024.07.27.605449v1)
