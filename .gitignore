@@ -1,19 +1,41 @@
+# OS / notebook / Python cache
 .DS_Store
+.ipynb_checkpoints/
 __pycache__/
+*.pyc
+
+# Experiment artifacts
 *.ckpt
-lightning_logs/
+*.pt
+*.pth
+*.h5
+*.parquet
+*.npy
+*.npz
+*.tmp
 wandb/
-results/
+lightning_logs/
 logs/
-data/ConsensusSeqs_SNPsOnlyUnphased
-data/ROSMAPConsensusSeqs_SNPsOnlyUnphased
-data/gtex_eqtl_expression_matrix/Whole_Blood.v8.normalized_expression.bed.gz
-data/gtex_eqtl_expression_matrix/Brain_Cortex.v8.normalized_expression.bed.gz
-data/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_Analysis_Freeze_SNPsOnly.vcf.gz*
-data/expression-rosmap.parquet
-data/hg38_genome.fa*
-data/GTEx_gene_tpm.csv
-data/tmp/*
-data/VCF
-data/gene_tpm_2017-06-05_v8_whole_blood.gct.gz
-test/expected_results
+results/
+test/expected_results/
+
+# Data safety defaults: ignore all data by default
+data/**
+
+# Keep lightweight data documentation only
+!data/
+!data/README.md
+
+# Common genomics / archive formats
+*.vcf
+*.vcf.gz
+*.bcf
+*.fa
+*.fasta
+*.fna
+*.fai
+*.gct
+*.gct.gz
+*.bed
+*.bed.gz
+*.zip
