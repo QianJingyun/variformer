@@ -8,6 +8,11 @@
 
 source ~/.bashrc
 
+#####################
+# "Scratch" is a hard drive attached to a specific computer
+# the logic here is a "Copy In --> Compute --> Copy Out" pattern.
+# If they ran this directly on global storage (/home/jqian54/...), thousands of jobs trying to read the VCF at the same time would crash the network. By copying it to "Scratch" first, each job reads from its own private hard drive, making it much faster and safer.
+#####################
 #specify scartch if it isn't defined
 if [[ -z "$TMPDIR" ]]; then
   if [[ -d /scratch ]]; then TMPDIR=/scratch/$USER; else TMPDIR=/tmp/$USER; fi
@@ -59,10 +64,20 @@ echo TMPDIR
 echo $TMPDIR
 echo| ls -lhtr $TMPDIR
 
+#######################
+# SGE_TASK_ID: This is the job number (e.g., 1, 2, 3, 4...).
+# sed -n "Xp": This command reads the file and extracts only line number X.
+#######################
 sample=$(sed -n "${SGE_TASK_ID}p" $duplicated_samples_file_path) #Get sample ID corresponding to this array job task
 echo sample $sample
 
 
+#######################
+# Odd Jobs : The script sets haplotype=2.
+# Even Jobs : The script sets haplotype=1.
+
+# For this to work, the duplicated_samples_list.txt must have duplicated individual_id
+#######################
 #if task ID is even, gen fasta using haplotype =1, else use haplotype = 2. This ensures each 
 if [ `expr  $SGE_TASK_ID % 2` == 0 ]; then
         haplotype=1
@@ -72,6 +87,12 @@ if [ `expr  $SGE_TASK_ID % 2` != 0 ]; then
         haplotype=2
 fi
 echo haplotype $haplotype
+
+
+#######################
+# bcftools consensus command generates two copies of every chromosome.
+# samtools command creates a small index file (.fai) for the new FASTA file
+#######################
 ## 3. Generate consensus sequence with one haplotype from the VCF.
 bcftools consensus --fasta-ref=$TMPDIR/ref_fasta.fa --haplotype=$haplotype --samples=$sample $TMPDIR/bcf_in.bcf.gz -o $TMPDIR/${sample}_consensus_H${haplotype}.fa 
 samtools faidx $TMPDIR/${sample}_consensus_H${haplotype}.fa 

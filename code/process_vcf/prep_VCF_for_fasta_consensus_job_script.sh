@@ -8,11 +8,15 @@
 
 source ~/.bashrc
 
+##############
+# This takes the directory path
+##############
 vcf_dir=$1
 
 
-
-
+##############
+# Computers read Binary BCF much faster than text VCF.
+##############
 ### create bcf from vcf, if it doesn't exist already
 if [ ! -f "$vcf_dir/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_Analysis_Freeze.bcf.gz" ]; then
 	outfile=$vcf_dir/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_Analysis_Freeze.bcf.gz
@@ -37,6 +41,10 @@ fi
 # fi
 
 
+##############
+# --types snps tells the tool to throw away insertions and deletions (indels).
+# It only keeps SNPs so that the length of DNA seq do not change.
+##############
 #subset SNPs and index new files from unphased BCF
 bcftools view --types snps --output-type b --output $vcf_dir/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_Analysis_Freeze_SNPsOnly.bcf.gz $vcf_dir/GTEx_Analysis_2017-06-05_v8_WholeGenomeSeq_838Indiv_Analysis_Freeze.bcf.gz
 echo done subsetting SNPs from unphased bcf

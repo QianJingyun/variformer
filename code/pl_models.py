@@ -270,8 +270,10 @@ class MetricLogger(pl.Callback):
                 pl_module.log_dict(epoch_dict)
     
     def add_all_genes_to_metrics_history(self,pl_module,donor_split):
-        pearson = PearsonCorrCoef(num_outputs=1).to(pl_module.device)
-        r2_score = R2Score(num_outputs=1).to(pl_module.device)
+        #pearson = PearsonCorrCoef(num_outputs=1).to(pl_module.device)
+        #r2_score = R2Score(num_outputs=1).to(pl_module.device)
+        pearson = PearsonCorrCoef().to(pl_module.device)
+        r2_score = R2Score().to(pl_module.device)
         for gene_name in pl_module.pred_dict.keys():
             if gene_name in pl_module.genes_for_training:
                 gene_split = 'train'

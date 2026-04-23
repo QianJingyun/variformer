@@ -8,6 +8,7 @@ from lightning.pytorch import LightningDataModule
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.distributed import DistributedSampler
 
+
 class GTExDataset(Dataset):
     def __init__(self, 
              tissues_to_train: list, 
@@ -45,8 +46,13 @@ class GTExDataset(Dataset):
             self.tissues_to_train = tissues_to_train
 
         # define genomic regions to be used
-        self.all_regions = pd.read_csv(os.path.join(self.DATA_DIR, "Enformer_genomic_regions_TSSCenteredGenes_FixedOverlapRemoval.csv"))
+        #self.all_regions = pd.read_csv(os.path.join(self.DATA_DIR, "Enformer_genomic_regions_TSSCenteredGenes_FixedOverlapRemoval.csv")) # What is this file? 
+        self.all_regions = pd.read_csv(os.path.join(self.DATA_DIR, "rosmap_wgs", 
+                                                    "Enformer_genomic_regions_TSSCenteredGenes_FixedOverlapRemoval.csv")) # change 3 location of file
         self.genomic_regions_df = self.all_regions[self.all_regions['gene_name'].isin(requested_regions)]
+        expr_genes = set(self.gene_expression_df.index) # change 5 filter out any genes not in the expression dataset.
+        self.genomic_regions_df = self.genomic_regions_df[self.genomic_regions_df['gene_name'].isin(expr_genes)]
+        
         self.genomic_regions_df = self.genomic_regions_df.reset_index(drop=True)
         self.genes_in_dataset = list(self.genomic_regions_df['gene_name'].unique())
         
@@ -65,6 +71,20 @@ class GTExDataset(Dataset):
         self.consensus_seq_dir = os.path.join(self.DATA_DIR, "ConsensusSeqs_SNPsOnlyUnphased")
 
         self.shuffle_and_define_epoch()
+
+        """ -----------------------------------------------Epoch-----------------------------------------------
+        select_donors(): find individuals with both desired tissue and RNA-seq and in the training dataset. 
+
+        1 Epoch usually means "The model has seen every data point exactly once."
+        Here, 1 Epoch means: "The model has looked at every gene, and for each gene, it has used as many people as possible to perform updates."
+        Why? it forces the model to learn from almost everyone for every gene in every single epoch.
+        self.n_gene_replicate_batches_per_epoch = number of total individuals I select // number of people I want in each batch. This is how many full cycles (steps) per gene. 
+        Quiz: What is the number of steps in one epoch?
+        Answer: total number of genes * number of batches per gene (n_gene_replicate_batches_per_epoch)
+        Quiz: Do I always run on the same individuals for one gene?
+        Answer: Not really. We always pull from the same group of individuals. The group randomly picks self.num_individuals_per_gene people. 
+        -----------------------------------------------My comments end-----------------------------------------------"""
+        
     def _get_gene_and_individual_from_idx(self, idx):
         # Determines which gene to use. If the number of individuals per gene is 10 and the idx is 0, pick the 0th gene
         # if it is 10 pick the 1st gene and so on
@@ -78,6 +98,18 @@ class GTExDataset(Dataset):
         individual = self.indivs_per_epoch[region_idx][individual_idx]
 
         return region_row, individual
+
+        """ -----------------------------------------------A smart helper function-----------------------------------------------
+        PyTorch: environment
+        Tensors: multi-dimensional array of numbers that run really fast on GPU. Everything in a model—inputs (like images or text), weights (what the model learns), and outputs—is represented as a Tensor.
+        DataLoader: carries batches of data
+        
+        This function is a quick check of individuals, and batch number given the index. 
+        This is a cool function with runtime O(1). It's just numerical operation. 
+
+        If we do select_donors[index] and get the same result, the runtime is O(n).
+        -----------------------------------------------My comments end-----------------------------------------------"""
+    
     def select_donors(self):
         """
         Returns donors from the desired Cross-Validation Split (defined by donor_list_path) that include gene expression data for the desired tissue.
@@ -128,11 +160,13 @@ class GTExDataset(Dataset):
         Variants in human-readable formats like VCF tend to be 1-based. To find them, region_start = pos - 1, region_end = pos
         """
         consensus1_open = pysam.Fastafile(self.get_path_to_consensus_seq(gtex_id,1))
+        # This opens the DNA file for the first copy (Haplotype 1). pysam is a library that allows you to jump to a specific spot in a huge DNA file very quickly.
         consensus2_open = pysam.Fastafile(self.get_path_to_consensus_seq(gtex_id,2))
         seq1 = consensus1_open.fetch(region_chr, region_start, region_end).upper()
         assert len(seq1) == self.desired_seq_len, f"Seq1 should be length {self.desired_seq_len}. Offending region: {region_chr}:{region_start}-{region_end}"
         seq2 = consensus2_open.fetch(region_chr, region_start, region_end).upper()
         assert len(seq2) == self.desired_seq_len, f"Seq2 should be length {self.desired_seq_len}. Offending region: {region_chr}:{region_start}-{region_end}"
+        # Always clean up! This closes the file to save memory.
         consensus1_open.close()
         consensus2_open.close()
         
@@ -164,7 +198,16 @@ class GTExDataset(Dataset):
                                                             region_end
                                                             )
         gene_expression = self._get_single_GTEx_donor_expression(sampled_individual,gene_name)
-        return dna_seq,gene_expression   
+        return dna_seq,gene_expression
+
+        """ -----------------------------------------------Sequence Length-----------------------------------------------
+        region_start and region_end are transcription start sites.
+        region_start, TSS, region_end
+
+        start<---center<---region_end
+        
+        -----------------------------------------------My comments end-----------------------------------------------"""
+        
     def shuffle_and_define_epoch(self):
         """
         This method shuffles the dataset in a way that ensures each batch contains only one gene, and the same gene appears in consecutive batches until the number of desired batches for gradient accumulation has been satisfied.
@@ -195,6 +238,8 @@ class GTExDataset(Dataset):
         shuffled_idxs = np.random.permutation(len(self.region_rows_in_epoch))
         self.region_rows_in_epoch = [self.region_rows_in_epoch[i] for i in shuffled_idxs]
         self.indivs_per_epoch = [self.indivs_per_epoch[i] for i in shuffled_idxs]
+
+
     def __getitem__(self, idx):
                        
                        
@@ -235,7 +280,7 @@ class ROSMAPDataset(GTExDataset):
         """
         self.tissues_to_train = ['DLPFC'] # dorsolateral prefrontal cortex
         super().__init__(self.tissues_to_train,requested_regions,desired_seq_len,num_individuals_per_gene,donor_list_path,gene_expression_df,DATA_DIR)
-        self.consensus_seq_dir = os.path.join(self.DATA_DIR, "ROSMAPConsensusSeqs_SNPsOnlyUnphased")
+        self.consensus_seq_dir = os.path.join(self.DATA_DIR, "genomes_rosmap") # change 1, the directory of FASTA file
 
     def generate_train_batch_one_gene(self,sampled_individual,region_chr,region_start,region_end,gene_name):
         """
@@ -260,9 +305,9 @@ class ROSMAPDataset(GTExDataset):
 
           
         return dna_seq,gene_expression
-    def get_path_to_consensus_seq(self,donor_id, haplotype_num):
+    def get_path_to_consensus_seq(self,donor_id, haplotype_num): # change 2, modify the fasta file name and format.
         """Consensus sequences have different naming scheme between GTEx and ROSMAP. Overwrite to accomodate this."""
-        return os.path.join(self.consensus_seq_dir, f"{donor_id}_H{haplotype_num}.fa")
+        return os.path.join(self.consensus_seq_dir, f"{donor_id}_consensus_H{haplotype_num}.fa.gz")
     def _get_single_ROSMAP_donor_expression(self,donor_id,gene_name):
         """
         donor_id (str): ROSMAP donor ID

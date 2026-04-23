@@ -22,10 +22,6 @@ test/expected_results/
 # Data safety defaults: ignore all data by default
 data/**
 
-# Keep lightweight data documentation only
-!data/
-!data/README.md
-
 # Common genomics / archive formats
 *.vcf
 *.vcf.gz

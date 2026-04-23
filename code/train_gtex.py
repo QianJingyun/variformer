@@ -94,15 +94,20 @@ def define_donor_paths(config,dataset):
             config.update({'train_donor_path':os.path.join(donor_dir,f"person_ids-train-fold{config.fold}.txt")})
             config.update({'valid_donor_path':os.path.join(donor_dir,f"person_ids-val-fold{config.fold}.txt")})
             config.update({'test_donor_path':os.path.join(donor_dir,f"person_ids-test-fold{config.fold}.txt")})
-        elif dataset == 'rosmap':
-            #train and validation set are from rosmap. Test set will be individuals from gtex to enable cross-cohort evaluation
-            rosmap_dir = os.path.join(config.DATA_DIR,'cross_validation_folds',dataset)
+        # elif dataset == 'rosmap':
+        #     #train and validation set are from rosmap. Test set will be individuals from gtex to enable cross-cohort evaluation
+        #     rosmap_dir = os.path.join(config.DATA_DIR,'cross_validation_folds',dataset)
+        #     config.update({'train_donor_path':os.path.join(rosmap_dir,f"person_ids-train-fold{config.fold}.txt")})
+        #     config.update({'valid_donor_path':os.path.join(rosmap_dir,f"person_ids-val-fold{config.fold}.txt")})
+
+        #     #using all individuals from gtex as test set. Dataset will keep only those with brain cortex data.
+        #     all_gtex_donor_path = os.path.join(config.DATA_DIR,'cross_validation_folds','gtex','All_GTEx_ID_list.txt')
+        #     config.update({'test_donor_path' : all_gtex_donor_path}) 
+        elif dataset == 'rosmap': # change 1 remove the gtex logic
+            rosmap_dir = os.path.join(config.DATA_DIR,'cross_validation_folds_jq','cv-fold-usable') # change 2 the direction
             config.update({'train_donor_path':os.path.join(rosmap_dir,f"person_ids-train-fold{config.fold}.txt")})
             config.update({'valid_donor_path':os.path.join(rosmap_dir,f"person_ids-val-fold{config.fold}.txt")})
-
-            #using all individuals from gtex as test set. Dataset will keep only those with brain cortex data.
-            all_gtex_donor_path = os.path.join(config.DATA_DIR,'cross_validation_folds','gtex','All_GTEx_ID_list.txt')
-            config.update({'test_donor_path' : all_gtex_donor_path}) 
+            config.update({'test_donor_path':os.path.join(rosmap_dir,f"person_ids-test-fold{config.fold}.txt")})
         else:
             raise Exception(f"Dataset: {dataset} not supported!")
 

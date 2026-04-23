@@ -1,0 +1,41 @@
+Starting cleanup of unfinished jobs (Task 286+)...
+Task 286 unfinished. Targeting files for: SM-CJEJ3_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ3_consensus_H1.fa.gz*
+Task 287 unfinished. Targeting files for: SM-CJEJ4_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ4_consensus_H2.fa.gz*
+Task 288 unfinished. Targeting files for: SM-CJEJ4_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ4_consensus_H1.fa.gz*
+Task 289 unfinished. Targeting files for: SM-CJEJ5_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ5_consensus_H2.fa.gz*
+Task 290 unfinished. Targeting files for: SM-CJEJ5_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ5_consensus_H1.fa.gz*
+Task 291 unfinished. Targeting files for: SM-CJEJ6_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ6_consensus_H2.fa.gz*
+Task 292 unfinished. Targeting files for: SM-CJEJ6_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ6_consensus_H1.fa.gz*
+Task 293 unfinished. Targeting files for: SM-CJEJ7_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ7_consensus_H2.fa.gz*
+Task 294 unfinished. Targeting files for: SM-CJEJ7_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ7_consensus_H1.fa.gz*
+Task 295 unfinished. Targeting files for: SM-CJEJ8_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ8_consensus_H2.fa.gz*
+Task 296 unfinished. Targeting files for: SM-CJEJ8_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ8_consensus_H1.fa.gz*
+Task 297 unfinished. Targeting files for: SM-CJEJ9_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ9_consensus_H2.fa.gz*
+Task 298 unfinished. Targeting files for: SM-CJEJ9_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJ9_consensus_H1.fa.gz*
+Task 299 unfinished. Targeting files for: SM-CJEJA_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJA_consensus_H2.fa.gz*
+Task 300 unfinished. Targeting files for: SM-CJEJA_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJA_consensus_H1.fa.gz*
+Task 301 unfinished. Targeting files for: SM-CJEJB_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJB_consensus_H2.fa.gz*
+Task 302 unfinished. Targeting files for: SM-CJEJB_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJB_consensus_H1.fa.gz*
+Task 303 unfinished. Targeting files for: SM-CJEJD_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJD_consensus_H2.fa.gz*
+Task 304 unfinished. Targeting files for: SM-CJEJD_consensus_H1
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJD_consensus_H1.fa.gz*
+Task 305 unfinished. Targeting files for: SM-CJEJE_consensus_H2
+ -> rm -f /home/jqian54/sulab/enformer_fine_tuning/data/genomes_rosmap/SM-CJEJE_consensus_H2.fa.gz*
