@@ -34,6 +34,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seq_length", type=int, default=49152)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument(
+        "--check_gene",
+        type=str,
+        default=None,
+        help="Optional gene name to sanity-check donor and matrix shape from saved NPZ.",
+    )
     return parser.parse_args()
 
 
@@ -250,6 +256,33 @@ def subset_rows_by_donors(
     return X[indices, :], selected
 
 
+def run_shape_and_split_check(
+    out_dir: str,
+    gene_name: str,
+    train_path: str,
+    valid_path: str,
+    test_path: str,
+) -> None:
+    npz_path = os.path.join(out_dir, f"{gene_name}.npz")
+    if not os.path.exists(npz_path):
+        print(f"[CHECK] Gene file not found: {npz_path}")
+        return
+
+    data = np.load(npz_path, allow_pickle=True)
+    donor_ids = [str(x) for x in data["donor_ids"].tolist()]
+    print(f"[CHECK] Gene: {gene_name}")
+    print(f"[CHECK] Total donors in extracted matrix: {data['X'].shape[0]}")
+    print(f"[CHECK] Total SNVs: {data['X'].shape[1]}")
+
+    train_donors = set(read_lines(train_path))
+    valid_donors = set(read_lines(valid_path))
+    test_donors = set(read_lines(test_path))
+
+    print(f"[CHECK] Train donors in matrix: {sum(1 for d in donor_ids if d in train_donors)}")
+    print(f"[CHECK] Valid donors in matrix: {sum(1 for d in donor_ids if d in valid_donors)}")
+    print(f"[CHECK] Test donors in matrix: {sum(1 for d in donor_ids if d in test_donors)}")
+
+
 def main() -> None:
     args = parse_args()
     if args.fold != 1:
@@ -344,6 +377,8 @@ def main() -> None:
     print(f"- Genes failed: {len(fail_genes)}")
     if fail_genes:
         print(f"- Failed gene list: {','.join(fail_genes)}")
+    if args.check_gene is not None:
+        run_shape_and_split_check(out_dir, args.check_gene, train_path, valid_path, test_path)
 
 
 if __name__ == "__main__":
